@@ -188,6 +188,7 @@ services:
       - DB_SQLITE_FILE=/data/database.sqlite
     volumes:
       - \${CONFIG_DIR}/proxymanager:/data
+      - \${CONFIG_DIR}/proxymanager/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "81:81"
