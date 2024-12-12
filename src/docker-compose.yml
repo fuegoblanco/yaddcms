@@ -1,0 +1,113 @@
+version: "3.9"
+
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/radarr:/config
+      - ${DATA_DIR}:/data
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/sonarr:/config
+      - ${DATA_DIR}:/data
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${CONFIG_DIR}/qbittorrent:/config
+      - ${TORRENTS_DIR}:/data/torrents
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/jellyfin:/config
+      - ${DATA_DIR}:/data
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+    restart: unless-stopped
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    environment:
+      - DB_SQLITE_FILE=/data/database.sqlite
+    volumes:
+      - ${CONFIG_DIR}/proxymanager:/data
+      - ${CONFIG_DIR}/proxymanager/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    restart: unless-stopped
+
+  flarsolver:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flarsolver
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      - ${CONFIG_DIR}/flarsolver:/config
+    ports:
+      - "8191:8191"
+    restart: unless-stopped
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    environment:
+      - TZ=${TZ}
+      - WEBPASSWORD=${WEBPASSWORD}
+    volumes:
+      - ${CONFIG_DIR}/pihole:/etc/pihole
+      - ${CONFIG_DIR}/dnsmasq:/etc/dnsmasq.d
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8800:80"
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
